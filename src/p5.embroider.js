@@ -4953,8 +4953,8 @@ p5embroidery.exportPES = function(filename = "embroideryPattern.pes") {
       }
 
       // Normal stitches
-      if (_DEBUG) console.log("=== New Stitch Run ===");
-      if (_DEBUG) console.log("Run:", run);
+      console.log("=== New Stitch Run ===");
+      console.log("Run:", run);
       
       for (const stitch of run) {
         // Validate stitch coordinates before processing
@@ -4971,6 +4971,7 @@ p5embroidery.exportPES = function(filename = "embroideryPattern.pes") {
           color: hexColor,
           command: stitch.command,
           jump: stitch.command === "jump",
+          trim: stitch.command === "trim",
         });
       }
     }
@@ -5244,13 +5245,13 @@ p5embroidery.exportPES = function(filename = "embroideryPattern.pes") {
       if (_DEBUG) console.log("Adding trim at position:", currentX, currentY);
 
       // Add a special point to indicate thread trim (in mm)
-      _stitchData.threads[threadIndex].runs.push([
+      lastRun.push(
         {
           x: currentX,
           y: currentY,
           command: "trim",
         },
-      ]);
+      );
 
       if (_drawMode === "stitch") {
         // draw a scissors emoji at the trim point

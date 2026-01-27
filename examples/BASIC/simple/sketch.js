@@ -41,22 +41,23 @@ function draw() {
 
   beginRecord(this);
   // Draw a 100mm square
-  setStitch(0.1, 0.2, 0);
+  setStitch(2, 5, 0);
   setStrokeSettings({
-    stitchLength: 0.5,
-    stitchWidth: 0.2,
-    noise: 0.0,
+    stitchLength: 4,
+    stitchWidth: 0.5,
+    noise: 0,
     stitchInterpolate: true,
   });
+
   stroke(0, 0, 200);
-  strokeWeight(5);
+  strokeWeight(1);
   setStrokeMode("parallel");
   noFill();
   rect(0, 0, 80, 80, 2);
   trimThread();
 
   // Draw a 200px circle
-  strokeWeight(5);
+  strokeWeight(1);
 
   setFillMode("tatami");
   setStrokeMode("parallel");
