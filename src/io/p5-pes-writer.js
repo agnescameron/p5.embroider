@@ -253,6 +253,7 @@ pecEncode(stitches, colors, trimFlags) {
       if (isTrim) {
         dx = this.flagTrim(dx);
         dy = this.flagTrim(dy);
+
         if (_DEBUG_PES) {
           console.log("PEC trim at first stitch");
         }
@@ -271,11 +272,14 @@ pecEncode(stitches, colors, trimFlags) {
       dy = this.encodeLongForm(dy);
       dx = this.flagTrim(dx);
       dy = this.flagTrim(dy);
-      this.writeInt16BE(dx);
-      this.writeInt16BE(dy);
+      this.writeInt8(0xfe);
+      this.writeInt8(0xb0);
+      this.writeInt8(colorTwo ? 2 : 1);
+      colorTwo = !colorTwo;
+      
       
       if (_DEBUG_PES) {
-        console.log("PEC trim at stitch", i);
+        console.log("PEC trim at stitch", i, "recorded as colour change");
       }
       continue;
     }
@@ -514,6 +518,7 @@ pecEncode(stitches, colors, trimFlags) {
   // Extract stitches, colors, and trim flags from transformed points
     const stitches = transformedPoints.map(p => ({ x: p.x, y: p.y }));
     const colors = transformedPoints.map(p => p.color || 0xFF0000);
+    console.log('colors is', colors)
     const trimFlags = transformedPoints.map(p => p.command === "trim" || false);
 
     if (_DEBUG_PES) {
