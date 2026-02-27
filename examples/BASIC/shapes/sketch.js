@@ -23,11 +23,11 @@ function setup() {
   });
   exportDstButton.position(0, height + 30);
 
-  let exportGcodeButton = createButton("Export Gcode");
-  exportGcodeButton.mousePressed(() => {
-    exportGcode("simple.gcode");
+  let exportPesButton = createButton("Export PES");
+  exportPesButton.mousePressed(() => {
+    exportEmbroidery("simple.pes");
   });
-  exportGcodeButton.position(90, height + 30);
+  exportPesButton.position(90, height + 30);
 
   //noLoop(); // Stop the draw loop after exporting
 }
