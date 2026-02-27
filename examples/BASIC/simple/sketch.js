@@ -54,6 +54,8 @@ function draw() {
   setStrokeMode("parallel");
   noFill();
   rect(0, 0, 80, 80, 2);
+  stroke(200, 100, 100);
+  rect(7, 7, 66, 66, 2);
   trimThread();
 
   // Draw a 200px circle

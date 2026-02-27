@@ -4890,7 +4890,7 @@ p5embroidery.exportPES = function(filename = "embroideryPattern.pes") {
 
   if (_DEBUG) console.log("=== Starting PES Export ===");
   if (_DEBUG) console.log("Canvas size:", _stitchData.width, _stitchData.height);
-  if (_DEBUG) console.log("Stitch data:", _stitchData);
+  console.log("Stitch data:", _stitchData);
 
   let currentThreadIndex = -1;
 

@@ -272,14 +272,11 @@ pecEncode(stitches, colors, trimFlags) {
       dy = this.encodeLongForm(dy);
       dx = this.flagTrim(dx);
       dy = this.flagTrim(dy);
-      this.writeInt8(0xfe);
-      this.writeInt8(0xb0);
-      this.writeInt8(colorTwo ? 2 : 1);
-      colorTwo = !colorTwo;
-      
+      this.writeInt16BE(dx);
+      this.writeInt16BE(dy);
       
       if (_DEBUG_PES) {
-        console.log("PEC trim at stitch", i, "recorded as colour change");
+        console.log("PEC trim at stitch", i);
       }
       continue;
     }
