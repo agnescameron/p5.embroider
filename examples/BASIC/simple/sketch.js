@@ -17,17 +17,17 @@ function setup() {
     drawMode = "p5";
   });
 
-  let exportDstButton = createButton("Export PES");
+  let exportDstButton = createButton("Export DST");
   exportDstButton.mousePressed(() => {
+    exportEmbroidery("simple.dst");
+  });
+  exportDstButton.position(90, height + 30);
+
+  let exportPesButton = createButton("Export PES");
+  exportPesButton.mousePressed(() => {
     exportEmbroidery("simple.pes");
   });
-  exportDstButton.position(0, height + 30);
-
-  let exportGcodeButton = createButton("Export Gcode");
-  exportGcodeButton.mousePressed(() => {
-    exportGcode("simple.gcode");
-  });
-  exportGcodeButton.position(90, height + 30);
+  exportPesButton.position(0, height + 30);
 
   //noLoop(); // Stop the draw loop after exporting
 }
@@ -41,25 +41,22 @@ function draw() {
 
   beginRecord(this);
   // Draw a 100mm square
-  setStitch(2, 5, 0);
+  setStitch(1, 2, 0);
   setStrokeSettings({
-    stitchLength: 4,
-    stitchWidth: 0.5,
-    noise: 0,
+    stitchLength: 3,
+    stitchWidth: 1,
+    noise: 0.0,
     stitchInterpolate: true,
   });
-
   stroke(0, 0, 200);
-  strokeWeight(1);
+  strokeWeight(5);
   setStrokeMode("parallel");
   noFill();
   rect(0, 0, 80, 80, 2);
-  stroke(200, 100, 100);
-  rect(7, 7, 66, 66, 2);
   trimThread();
 
   // Draw a 200px circle
-  strokeWeight(1);
+  strokeWeight(5);
 
   setFillMode("tatami");
   setStrokeMode("parallel");
@@ -68,7 +65,7 @@ function draw() {
 
   trimThread();
 
-  // Stop recording and export as DST
+  // Stop recording and export
   endRecord();
 }
 
