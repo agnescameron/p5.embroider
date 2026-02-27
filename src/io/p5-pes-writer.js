@@ -214,7 +214,7 @@ export class PESWriter {
     return longForm | (this.TRIM_CODE << 8);
   }
 
-  pecEncode(stitches, colors) {
+  pecEncode(stitches, colors, trimFlags) {
     let colorTwo = true;
     let xx = 0,
       yy = 0;
@@ -234,6 +234,7 @@ export class PESWriter {
 
       const x = stitches[i].x;
       const y = stitches[i].y;
+      const isTrim = trimFlags && trimFlags[i];
 
       let dx = Math.round(x - xx);
       let dy = Math.round(y - yy);
@@ -254,11 +255,28 @@ export class PESWriter {
         dy = 0;
       }
 
+    if (isTrim) {
+      dx = this.encodeLongForm(dx);
+      dy = this.encodeLongForm(dy);
+      dx = this.flagTrim(dx);
+      dy = this.flagTrim(dy);
+      this.writeInt16BE(dx);
+      this.writeInt16BE(dy);
+      
+      if (_DEBUG_PES) {
+        console.log("PEC trim at stitch", i);
+      }
+      continue;
+    }
+
+
       // Short form: -64 to 63
       if (dx < 63 && dx > -64 && dy < 63 && dy > -64) {
         this.writeInt8(dx & this.MASK_07_BIT);
         this.writeInt8(dy & this.MASK_07_BIT);
       } else {
+
+
         // Long form
         dx = this.encodeLongForm(dx);
         dy = this.encodeLongForm(dy);
@@ -272,7 +290,7 @@ export class PESWriter {
 
   // ===== PEC Header and Blocks =====
 
-  writePecHeader(title, colors) {
+  writePecHeader(title, colors, trimFlags) {
     const colorIndexList = [];
 
     // Title line (16 chars padded, with \r)
@@ -328,7 +346,7 @@ export class PESWriter {
     return { colorIndexList, palette };
   }
 
-  writePecBlock(bounds, stitches, colors) {
+  writePecBlock(bounds, stitches, colors, trimFlags) {
     const width = Math.round(bounds.width);
     const height = Math.round(bounds.height);
 
@@ -351,7 +369,7 @@ export class PESWriter {
     this.writeInt16BE(0x9000 | (-Math.round(bounds.minX) & 0xffff));
     this.writeInt16BE(0x9000 | (-Math.round(bounds.minY) & 0xffff));
 
-    this.pecEncode(stitches, colors);
+    this.pecEncode(stitches, colors, trimFlags);
 
     const stitchBlockLength = this.tell() - stitchBlockStart;
     this.writeSpaceHolder24LE(stitchBlockLength);
@@ -374,9 +392,9 @@ export class PESWriter {
     ]);
   }
 
-  writePec(title, stitches, colors, border) {
+  writePec(title, stitches, colors, border, trimFlags) {
     const colorInfo = this.writePecHeader(title, colors);
-    this.writePecBlock(border, stitches, colors);
+    this.writePecBlock(border, stitches, colors, trimFlags);
 
     // Write graphics for each color
     this.writePecGraphics();
@@ -392,13 +410,13 @@ export class PESWriter {
   }
 
   // Version 1 truncated (PEC-only) - simplest format
-  writeTruncatedVersion1(title, stitches, colors, border) {
+  writeTruncatedVersion1(title, stitches, colors, border, trimFlags) {
     this.writeString("#PES0001");
     this.writeInt8(0x16);
     for (let i = 0; i < 13; i++) {
       this.writeInt8(0x00);
     }
-    this.writePec(title, stitches, colors, border);
+    this.writePec(title, stitches, colors, border, trimFlags);
   }
 
   // ===== Main Generation Function (matching DST pattern) =====
@@ -465,9 +483,15 @@ export class PESWriter {
     // Extract stitches and colors arrays from transformed points
     const stitches = transformedPoints.map((p) => ({ x: p.x, y: p.y }));
     const colors = transformedPoints.map((p) => p.color || 0xff0000);
+    const trimFlags = transformedPoints.map(p => p.command === "trim" || false);
 
     // Write the file
-    this.writeTruncatedVersion1(title, stitches, colors, border);
+    this.writeTruncatedVersion1(title, stitches, colors, border, trimFlags);
+
+    if (_DEBUG_PES) {
+      const trimCount = trimFlags.filter(t => t).length;
+      console.log("Trim commands found:", trimCount);
+    }
 
     return new Uint8Array(this.buffer);
   }

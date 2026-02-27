@@ -5023,6 +5023,7 @@ function setDebugMode(enabled) {
             color: hexColor,
             command: stitch.command,
             jump: stitch.command === "jump",
+            trim: stitch.command === "trim",
           });
         }
       }
